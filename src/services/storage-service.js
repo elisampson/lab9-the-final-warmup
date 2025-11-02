@@ -1,52 +1,44 @@
 /**
- * StorageService - Handles localStorage operations for the TODO app
+ * Handles all localStorage operations for the TODO app.
  */
 export class StorageService {
   constructor(storageKey = 'todos') {
     this.storageKey = storageKey;
   }
 
-  /**
-   * Save data to localStorage
-   */
-  save(k, d) {
+  // Save data to localStorage
+  save(key, data) {
     try {
-      const fk = `${this.storageKey}_${k}`;
-      localStorage.setItem(fk, JSON.stringify(d));
+      const fullKey = `${this.storageKey}_${key}`;
+      localStorage.setItem(fullKey, JSON.stringify(data));
     } catch (error) {
-      console.error('Failed to save to localStorage:', error);
+      console.error(`Failed to save "${key}" to localStorage:`, error);
     }
   }
 
-  /**
-   * Load data from localStorage
-   */
+  // Load data from localStorage
   load(key, defaultValue = null) {
     try {
       const fullKey = `${this.storageKey}_${key}`;
-      const item = localStorage.getItem(fullKey);
-      return item ? JSON.parse(item) : defaultValue;
+      const storedValue = localStorage.getItem(fullKey);
+      return storedValue ? JSON.parse(storedValue) : defaultValue;
     } catch (error) {
-      console.error('Failed to load from localStorage:', error);
+      console.error(`Failed to load "${key}" from localStorage:`, error);
       return defaultValue;
     }
   }
 
-  /**
-   * Remove data from localStorage
-   */
-  remove(k) {
+  // Remove one stored key
+  remove(key) {
     try {
-      const fullK = `${this.storageKey}_${k}`;
-      localStorage.removeItem(fullK);
-    } catch (e) {
-      console.error('Failed to remove from localStorage:', e);
+      const fullKey = `${this.storageKey}_${key}`;
+      localStorage.removeItem(fullKey);
+    } catch (error) {
+      console.error(`Failed to remove "${key}" from localStorage:`, error);
     }
   }
 
-  /**
-   * Clear all data for this app
-   */
+  // Clear all keys for this app
   clear() {
     try {
       const keysToRemove = [];
@@ -58,7 +50,7 @@ export class StorageService {
       }
       keysToRemove.forEach(key => localStorage.removeItem(key));
     } catch (error) {
-      console.error('Failed to clear localStorage:', error);
+      console.error(`Failed to clear localStorage for "${this.storageKey}":`, error);
     }
   }
 }

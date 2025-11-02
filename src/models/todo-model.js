@@ -1,8 +1,13 @@
 /**
- * TodoModel - Manages the todo list data and business logic
- * Implements the Observer pattern for reactive updates
+ * @module TodoModel
+ * @description Manages the todo list data and business logic.
+ * Implements the Observer pattern for reactive updates.
  */
+
 export class TodoModel {
+  /**
+   * @param {import('../services/storage-service.js').StorageService} storageService
+   */
   constructor(storageService) {
     this.storage = storageService;
     this.todos = this.storage.load('items', []);
@@ -11,44 +16,47 @@ export class TodoModel {
   }
 
   /**
-   * Subscribe to model changes
+   * Subscribe to model changes.
+   * @param {Function} listener - Function to call on state change.
    */
   subscribe(listener) {
-    this.listeners.push(listener);
+    if (!this.listeners.includes(listener)) {
+      this.listeners.push(listener);
+    }
   }
 
   /**
-   * Notify all subscribers of changes
+   * Notify all subscribers of changes.
    */
   notify() {
     this.listeners.forEach(listener => listener());
   }
 
   /**
-   * Add a new todo
+   * Add a new todo.
+   * @param {string} text - The todo description.
    */
   addTodo(text) {
-    if (!text || text.trim() === '') {
-      return;
-    }
+    if (!text || text.trim() === '') return;
 
-    const todo = {
+    const newTodo = {
       id: this.nextId++,
       text: text.trim(),
       completed: false,
       createdAt: new Date().toISOString()
     };
 
-    this.todos.push(todo);
+    this.todos.push(newTodo);
     this.save();
     this.notify();
   }
 
   /**
-   * Toggle todo completion status
+   * Toggle todo completion status.
+   * @param {number} id - ID of the todo.
    */
   toggleComplete(id) {
-    const todo = this.todos.find(t => t.id === id);
+    const todo = this.todos.find(todo => todo.id === id);
     if (todo) {
       todo.completed = !todo.completed;
       this.save();
@@ -57,20 +65,28 @@ export class TodoModel {
   }
 
   /**
-   * Delete a todo
+   * Delete a todo.
+   * @param {number} id - ID of the todo.
    */
   deleteTodo(id) {
-    this.todos = this.todos.filter(t => t.id !== id);
-    this.save();
-    this.notify();
+    const updatedTodos = this.todos.filter(todo => todo.id !== id);
+    if (updatedTodos.length !== this.todos.length) {
+      this.todos = updatedTodos;
+      this.save();
+      this.notify();
+    }
   }
 
   /**
-   * Update todo text
+   * Update todo text.
+   * @param {number} id - ID of the todo.
+   * @param {string} newText - New text.
    */
   updateTodo(id, newText) {
-    const todo = this.todos.find(t => t.id === id);
-    if (todo && newText && newText.trim() !== '') {
+    if (!newText || newText.trim() === '') return;
+
+    const todo = this.todos.find(todo => todo.id === id);
+    if (todo) {
       todo.text = newText.trim();
       this.save();
       this.notify();
@@ -78,16 +94,19 @@ export class TodoModel {
   }
 
   /**
-   * Clear all completed todos
+   * Clear all completed todos.
    */
   clearCompleted() {
-    this.todos = this.todos.filter(t => !t.completed);
-    this.save();
-    this.notify();
+    const activeTodos = this.todos.filter(todo => !todo.completed);
+    if (activeTodos.length !== this.todos.length) {
+      this.todos = activeTodos;
+      this.save();
+      this.notify();
+    }
   }
 
   /**
-   * Clear all todos
+   * Clear all todos.
    */
   clearAll() {
     this.todos = [];
@@ -96,21 +115,23 @@ export class TodoModel {
   }
 
   /**
-   * Get count of active todos
+   * Count of active (not completed) todos.
+   * @returns {number}
    */
   get activeCount() {
-    return this.todos.filter(t => !t.completed).length;
+    return this.todos.filter(todo => !todo.completed).length;
   }
 
   /**
-   * Get count of completed todos
+   * Count of completed todos.
+   * @returns {number}
    */
   get completedCount() {
-    return this.todos.filter(t => t.completed).length;
+    return this.todos.filter(todo => todo.completed).length;
   }
 
   /**
-   * Save todos to storage
+   * Persist todos to storage.
    */
   save() {
     this.storage.save('items', this.todos);
