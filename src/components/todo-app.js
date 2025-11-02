@@ -5,8 +5,7 @@ import './todo-form.js';
 import './todo-list.js';
 
 /**
- * TodoApp - Main application component
- * Coordinates between Model and View components
+ * Main app component that connects the model to the UI.
  */
 export class TodoApp extends LitElement {
   static properties = {
@@ -122,41 +121,40 @@ export class TodoApp extends LitElement {
     super();
     this.storageService = new StorageService();
     this.model = new TodoModel(this.storageService);
-    this.todos = this.model.todos;
+    this.todos = [...this.model.todos];
 
-    // Subscribe to model changes
     this.model.subscribe(() => {
       this.todos = [...this.model.todos];
     });
   }
 
-  handleAddTodo(e) {
+  handleAdd = (e) => {
     this.model.addTodo(e.detail.text);
-  }
+  };
 
-  handleToggleTodo(e) {
+  handleToggle = (e) => {
     this.model.toggleComplete(e.detail.id);
-  }
+  };
 
-  handleDeleteTodo(e) {
+  handleDelete = (e) => {
     this.model.deleteTodo(e.detail.id);
-  }
+  };
 
-  handleUpdateTodo(e) {
+  handleUpdate = (e) => {
     this.model.updateTodo(e.detail.id, e.detail.text);
-  }
+  };
 
-  handleClearCompleted() {
+  handleClearCompleted = () => {
     if (confirm('Clear all completed todos?')) {
       this.model.clearCompleted();
     }
-  }
+  };
 
-  handleClearAll() {
+  handleClearAll = () => {
     if (confirm('Clear ALL todos? This cannot be undone.')) {
       this.model.clearAll();
     }
-  }
+  };
 
   render() {
     return html`
@@ -179,15 +177,13 @@ export class TodoApp extends LitElement {
           </div>
         </div>
 
-        <todo-form
-          @add-todo=${this.handleAddTodo}>
-        </todo-form>
+        <todo-form @add-todo=${this.handleAdd}></todo-form>
 
         <todo-list
           .todos=${this.todos}
-          @toggle-todo=${this.handleToggleTodo}
-          @delete-todo=${this.handleDeleteTodo}
-          @update-todo=${this.handleUpdateTodo}>
+          @toggle-todo=${this.handleToggle}
+          @delete-todo=${this.handleDelete}
+          @update-todo=${this.handleUpdate}>
         </todo-list>
 
         <div class="actions">

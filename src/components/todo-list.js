@@ -2,7 +2,7 @@ import { LitElement, html, css } from 'lit';
 import './todo-item.js';
 
 /**
- * TodoList - Displays a list of todos
+ * Displays a list of todo items.
  */
 export class TodoList extends LitElement {
   static properties = {
@@ -31,7 +31,6 @@ export class TodoList extends LitElement {
       overflow-y: auto;
     }
 
-    /* Custom scrollbar */
     .list-container::-webkit-scrollbar {
       width: 8px;
     }
@@ -69,10 +68,23 @@ export class TodoList extends LitElement {
     return html`
       <div class="list-container">
         ${this.todos.map(todo => html`
-          <todo-item .todo=${todo}></todo-item>
+          <todo-item
+            .todo=${todo}
+            @toggle-todo=${e => this._forwardEvent(e)}
+            @delete-todo=${e => this._forwardEvent(e)}
+            @update-todo=${e => this._forwardEvent(e)}>
+          </todo-item>
         `)}
       </div>
     `;
+  }
+
+  _forwardEvent(e) {
+    this.dispatchEvent(new CustomEvent(e.type, {
+      detail: e.detail,
+      bubbles: true,
+      composed: true
+    }));
   }
 }
 
