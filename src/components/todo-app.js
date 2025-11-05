@@ -4,12 +4,10 @@ import { StorageService } from '../services/storage-service.js';
 import './todo-form.js';
 import './todo-list.js';
 
-/**
- * Main app component that connects the model to the UI.
- */
 export class TodoApp extends LitElement {
   static properties = {
-    todos: { state: true }
+    todos: { state: true },
+    activeCount: { state: true }
   };
 
   static styles = css`
@@ -42,7 +40,7 @@ export class TodoApp extends LitElement {
 
     .stats {
       display: flex;
-      justify-content: space-between;
+      justify-content: center;
       align-items: center;
       padding: 16px;
       background: #f5f5f5;
@@ -71,12 +69,11 @@ export class TodoApp extends LitElement {
 
     .actions {
       display: flex;
-      gap: 8px;
+      justify-content: center;
       margin-top: 20px;
     }
 
     button {
-      flex: 1;
       padding: 10px 16px;
       border: none;
       border-radius: 8px;
@@ -84,23 +81,11 @@ export class TodoApp extends LitElement {
       font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
-    }
-
-    .clear-completed {
-      background: #ff9800;
-      color: white;
-    }
-
-    .clear-completed:hover {
-      background: #f57c00;
-    }
-
-    .clear-all {
       background: #f44336;
       color: white;
     }
 
-    .clear-all:hover {
+    button:hover {
       background: #da190b;
     }
 
@@ -123,38 +108,37 @@ export class TodoApp extends LitElement {
     super();
     this.storageService = new StorageService();
     this.model = new TodoModel(this.storageService);
-    this.todos = [...this.model.todos];
+    this._syncModel();
+  }
 
-    this.model.subscribe(() => {
-      this.todos = [...this.model.todos];
-    });
+  _syncModel() {
+    this.todos = [...this.model.todos];
+    this.activeCount = this.todos.length;
   }
 
   handleAdd = (e) => {
     this.model.addTodo(e.detail.text);
+    this.storageService.save(this.model.todos);
+    this._syncModel();
   };
 
   handleToggle = (e) => {
-    this.model.toggleComplete(e.detail.id);
-  };
-
-  handleDelete = (e) => {
     this.model.deleteTodo(e.detail.id);
+    this.storageService.save(this.model.todos);
+    this._syncModel();
   };
 
   handleUpdate = (e) => {
     this.model.updateTodo(e.detail.id, e.detail.text);
-  };
-
-  handleClearCompleted = () => {
-    if (confirm('Clear all completed todos?')) {
-      this.model.clearCompleted();
-    }
+    this.storageService.save(this.model.todos);
+    this._syncModel();
   };
 
   handleClearAll = () => {
     if (confirm('Clear ALL todos? This cannot be undone.')) {
       this.model.clearAll();
+      this.storageService.save(this.model.todos);
+      this._syncModel();
     }
   };
 
@@ -169,14 +153,6 @@ export class TodoApp extends LitElement {
             <div class="stat-value">${this.todos.length}</div>
             <div class="stat-label">Total</div>
           </div>
-          <div class="stat-item">
-            <div class="stat-value">${this.model.activeCount}</div>
-            <div class="stat-label">Active</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-value">${this.model.completedCount}</div>
-            <div class="stat-label">Completed</div>
-          </div>
         </div>
 
         <todo-form @add-todo=${this.handleAdd}></todo-form>
@@ -184,19 +160,11 @@ export class TodoApp extends LitElement {
         <todo-list
           .todos=${this.todos}
           @toggle-todo=${this.handleToggle}
-          @delete-todo=${this.handleDelete}
           @update-todo=${this.handleUpdate}>
         </todo-list>
 
         <div class="actions">
           <button
-            class="clear-completed"
-            @click=${this.handleClearCompleted}
-            ?disabled=${this.model.completedCount === 0}>
-            Clear Completed
-          </button>
-          <button
-            class="clear-all"
             @click=${this.handleClearAll}
             ?disabled=${this.todos.length === 0}>
             Clear All

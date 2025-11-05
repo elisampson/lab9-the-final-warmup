@@ -1,8 +1,5 @@
 import { LitElement, html, css } from 'lit';
 
-/**
- * Single todo item component.
- */
 export class TodoItem extends LitElement {
   static properties = {
     todo: { type: Object },
@@ -53,11 +50,6 @@ export class TodoItem extends LitElement {
       color: white;
     }
 
-    .delete {
-      background: #f44336;
-      color: white;
-    }
-
     input[type="text"] {
       flex: 1;
       padding: 8px;
@@ -72,16 +64,9 @@ export class TodoItem extends LitElement {
     this.isEditing = false;
   }
 
-  toggleComplete() {
+  completeAndRemove() {
+    // Treat checking the box as deletion
     this.dispatchEvent(new CustomEvent('toggle-todo', {
-      detail: { id: this.todo.id },
-      bubbles: true,
-      composed: true
-    }));
-  }
-
-  deleteTodo() {
-    this.dispatchEvent(new CustomEvent('delete-todo', {
       detail: { id: this.todo.id },
       bubbles: true,
       composed: true
@@ -121,8 +106,7 @@ export class TodoItem extends LitElement {
       <div class="todo-item">
         <input
           type="checkbox"
-          .checked=${this.todo.completed}
-          @change=${this.toggleComplete}
+          @change=${this.completeAndRemove}
         />
         ${this.isEditing
           ? html`
@@ -134,17 +118,13 @@ export class TodoItem extends LitElement {
               />
             `
           : html`
-              <span class="text ${this.todo.completed ? 'completed' : ''}">
+              <span class="text">
                 ${this.todo.text}
               </span>
               <button
                 class="edit"
-                @click=${this.startEdit}
-                ?disabled=${this.todo.completed}>
+                @click=${this.startEdit}>
                 Edit
-              </button>
-              <button class="delete" @click=${this.deleteTodo}>
-                Delete
               </button>
             `}
       </div>

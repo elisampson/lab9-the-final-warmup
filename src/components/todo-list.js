@@ -56,28 +56,31 @@ export class TodoList extends LitElement {
   }
 
   render() {
-    if (this.todos.length === 0) {
-      return html`
-        <div class="empty-state">
-          <div class="empty-icon">📝</div>
-          <p>No todos yet. Add one above!</p>
-        </div>
-      `;
-    }
-
+  // Show placeholder when there are no todos
+  if (this.todos.length === 0) {
     return html`
-      <div class="list-container">
-        ${this.todos.map(todo => html`
-          <todo-item
-            .todo=${todo}
-            @toggle-todo=${e => this._forwardEvent(e)}
-            @delete-todo=${e => this._forwardEvent(e)}
-            @update-todo=${e => this._forwardEvent(e)}>
-          </todo-item>
-        `)}
+      <div class="empty-state">
+        <div class="empty-icon">📝</div>
+        <p>No todos yet. Add one above!</p>
       </div>
     `;
   }
+  
+  // Render todo-item components when todos are present
+  return html`
+    <div class="list-container">
+      ${this.todos.map(todo => html`
+        <todo-item
+          .todo=${todo}
+          @toggle-todo=${(e) => this.dispatchEvent(new CustomEvent('toggle-todo', { detail: e.detail, bubbles: true, composed: true }))}
+          @delete-todo=${(e) => this.dispatchEvent(new CustomEvent('delete-todo', { detail: e.detail, bubbles: true, composed: true }))}
+          @update-todo=${(e) => this.dispatchEvent(new CustomEvent('update-todo', { detail: e.detail, bubbles: true, composed: true }))}
+        ></todo-item>
+      `)}
+    </div>
+  `;
+}
+
 
   _forwardEvent(e) {
     this.dispatchEvent(new CustomEvent(e.type, {

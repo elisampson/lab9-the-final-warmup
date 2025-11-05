@@ -57,6 +57,7 @@ export class TodoForm extends LitElement {
     this.text = e.target.value;
   }
 
+  // Handle form submission
   handleSubmit(e) {
     e.preventDefault();
     const trimmed = this.text.trim();

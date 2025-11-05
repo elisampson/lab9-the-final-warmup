@@ -1,4 +1,10 @@
-/* no CSS variables!?! */
+:root {
+  --font-stack: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --gradient-start: #667eea;
+  --gradient-end: #764ba2;
+  --max-width: 600px;
+  --padding: 20px;
+}
 
 * {
   box-sizing: border-box;
@@ -7,18 +13,18 @@
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: var(--font-stack);
+  background: linear-gradient(135deg, var(--gradient-start) 0%, var(--gradient-end) 100%);
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 20px;
+  padding: var(--padding);
 }
 
 main {
   width: 100%;
-  max-width: 600px;
+  max-width: var(--max-width);
 }
 
 /* Utility classes */

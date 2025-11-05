@@ -27,6 +27,7 @@ class MockStorage {
   }
 }
 
+// Tests for TodoModel
 test('addTodo creates a valid todo', () => {
   const model = new TodoModel(new MockStorage());
   model.addTodo('Test task');
@@ -39,12 +40,14 @@ test('addTodo creates a valid todo', () => {
   assert.ok(typeof todo.id === 'number');
 });
 
+
 test('addTodo ignores empty or blank input', () => {
   const model = new TodoModel(new MockStorage());
   model.addTodo('');
   model.addTodo('   ');
   assert.strictEqual(model.todos.length, 0);
 });
+
 
 test('toggleComplete switches completion state', () => {
   const model = new TodoModel(new MockStorage());
@@ -57,6 +60,7 @@ test('toggleComplete switches completion state', () => {
   model.toggleComplete(id);
   assert.strictEqual(model.todos[0].completed, false);
 });
+
 
 test('deleteTodo removes the correct task', () => {
   const model = new TodoModel(new MockStorage());
