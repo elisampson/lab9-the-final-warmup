@@ -1,17 +1,17 @@
 import { LitElement, html, css } from 'lit';
 
 /**
- * TodoForm - Input form for adding new todos
+ * Form for adding a new todo item.
  */
 export class TodoForm extends LitElement {
   static properties = {
-    inputValue: { state: true }
+    text: { state: true }
   };
 
   static styles = css`
     :host {
       display: block;
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     form {
@@ -19,38 +19,27 @@ export class TodoForm extends LitElement {
       gap: 8px;
     }
 
-    input {
+    input[type="text"] {
       flex: 1;
-      padding: 12px 16px;
+      padding: 10px;
       font-size: 16px;
-      border: 2px solid #e0e0e0;
       border-radius: 8px;
-      outline: none;
-      transition: border-color 0.3s;
-    }
-
-    input:focus {
-      border-color: #667eea;
+      border: 1px solid #ccc;
     }
 
     button {
-      padding: 12px 24px;
-      background: #667eea;
+      padding: 10px 16px;
+      background: #4caf50;
       color: white;
+      font-weight: bold;
       border: none;
       border-radius: 8px;
-      font-size: 16px;
-      font-weight: 600;
       cursor: pointer;
-      transition: background 0.3s;
+      transition: background 0.2s;
     }
 
     button:hover {
-      background: #5568d3;
-    }
-
-    button:active {
-      transform: translateY(1px);
+      background: #388e3c;
     }
 
     button:disabled {
@@ -61,26 +50,24 @@ export class TodoForm extends LitElement {
 
   constructor() {
     super();
-    this.inputValue = '';
+    this.text = '';
+  }
+
+  handleInput(e) {
+    this.text = e.target.value;
   }
 
   handleSubmit(e) {
     e.preventDefault();
-    const text = this.inputValue.trim();
-
-    if (text) {
+    const trimmed = this.text.trim();
+    if (trimmed) {
       this.dispatchEvent(new CustomEvent('add-todo', {
-        detail: { text },
+        detail: { text: trimmed },
         bubbles: true,
         composed: true
       }));
-
-      this.inputValue = '';
+      this.text = '';
     }
-  }
-
-  handleInput(e) {
-    this.inputValue = e.target.value;
   }
 
   render() {
@@ -88,15 +75,13 @@ export class TodoForm extends LitElement {
       <form @submit=${this.handleSubmit}>
         <input
           type="text"
-          placeholder="What needs to be done?"
-          .value=${this.inputValue}
+          .value=${this.text}
+          placeholder="Add a new task..."
           @input=${this.handleInput}
-          aria-label="New todo"
+          aria-label="Add new task"
           autofocus
         />
-        <button type="submit" ?disabled=${!this.inputValue.trim()}>
-          Add
-        </button>
+        <button type="submit" ?disabled=${!this.text.trim()}>Add</button>
       </form>
     `;
   }

@@ -30,12 +30,14 @@ export class TodoApp extends LitElement {
       color: #333;
       font-size: 32px;
       font-weight: 700;
+      text-align: center;
     }
 
     .subtitle {
       color: #666;
       margin-bottom: 24px;
       font-size: 14px;
+      text-align: center;
     }
 
     .stats {
