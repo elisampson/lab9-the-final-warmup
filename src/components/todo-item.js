@@ -1,8 +1,19 @@
 import { LitElement, html, css } from 'lit';
 
+/**
+ * `<todo-item>` component.
+ * Represents a single todo item with editing and completion support.
+ *
+ * Emits:
+ * - `toggle-todo`: CustomEvent<{ id: number }> — when checkbox is clicked (treated as removal).
+ * - `update-todo`: CustomEvent<{ id: number, text: string }> — when edited text is saved.
+ */
 export class TodoItem extends LitElement {
   static properties = {
+    /** The todo object to display */
     todo: { type: Object },
+
+    /** Whether the item is in edit mode */
     isEditing: { state: true }
   };
 
@@ -64,8 +75,10 @@ export class TodoItem extends LitElement {
     this.isEditing = false;
   }
 
+  /**
+   * Emits a `toggle-todo` event to delete/complete the todo.
+   */
   completeAndRemove() {
-    // Treat checking the box as deletion
     this.dispatchEvent(new CustomEvent('toggle-todo', {
       detail: { id: this.todo.id },
       bubbles: true,
@@ -73,14 +86,24 @@ export class TodoItem extends LitElement {
     }));
   }
 
+  /**
+   * Puts the item into edit mode.
+   */
   startEdit() {
     this.isEditing = true;
   }
 
+  /**
+   * Cancels editing.
+   */
   cancelEdit() {
     this.isEditing = false;
   }
 
+  /**
+   * Saves the edited text and emits `update-todo` if changed.
+   * @param {Event} e - The blur or key event containing new value.
+   */
   saveEdit(e) {
     const newText = e.target.value.trim();
     if (newText && newText !== this.todo.text) {
@@ -93,6 +116,12 @@ export class TodoItem extends LitElement {
     this.isEditing = false;
   }
 
+  /**
+   * Handles key events during editing.
+   * - `Enter` saves
+   * - `Escape` cancels
+   * @param {KeyboardEvent} e
+   */
   handleKey(e) {
     if (e.key === 'Enter') {
       this.saveEdit(e);
@@ -101,6 +130,10 @@ export class TodoItem extends LitElement {
     }
   }
 
+  /**
+   * Renders the todo item (view or edit mode).
+   * @returns {import('lit').TemplateResult}
+   */
   render() {
     return html`
       <div class="todo-item">

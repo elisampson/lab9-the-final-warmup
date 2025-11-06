@@ -2,10 +2,17 @@ import { LitElement, html, css } from 'lit';
 import './todo-item.js';
 
 /**
- * Displays a list of todo items.
+ * `<todo-list>` component.
+ * Renders a scrollable list of `<todo-item>` components.
+ *
+ * Emits (for each item):
+ * - `toggle-todo`: CustomEvent<{ id: number }>
+ * - `update-todo`: CustomEvent<{ id: number, text: string }>
+ * - `delete-todo`: CustomEvent<{ id: number }> (currently unused)
  */
 export class TodoList extends LitElement {
   static properties = {
+    /** Array of todo items to display */
     todos: { type: Array }
   };
 
@@ -52,36 +59,43 @@ export class TodoList extends LitElement {
 
   constructor() {
     super();
+    /** @type {Array<Object>} */
     this.todos = [];
   }
 
+  /**
+   * Renders the list of todo items or an empty state message.
+   * @returns {import('lit').TemplateResult}
+   */
   render() {
-  // Show placeholder when there are no todos
-  if (this.todos.length === 0) {
+    if (this.todos.length === 0) {
+      return html`
+        <div class="empty-state">
+          <div class="empty-icon">📝</div>
+          <p>No todos yet. Add one above!</p>
+        </div>
+      `;
+    }
+
     return html`
-      <div class="empty-state">
-        <div class="empty-icon">📝</div>
-        <p>No todos yet. Add one above!</p>
+      <div class="list-container">
+        ${this.todos.map(todo => html`
+          <todo-item
+            .todo=${todo}
+            @toggle-todo=${(e) => this._forwardEvent(e)}
+            @delete-todo=${(e) => this._forwardEvent(e)}
+            @update-todo=${(e) => this._forwardEvent(e)}
+          ></todo-item>
+        `)}
       </div>
     `;
   }
-  
-  // Render todo-item components when todos are present
-  return html`
-    <div class="list-container">
-      ${this.todos.map(todo => html`
-        <todo-item
-          .todo=${todo}
-          @toggle-todo=${(e) => this.dispatchEvent(new CustomEvent('toggle-todo', { detail: e.detail, bubbles: true, composed: true }))}
-          @delete-todo=${(e) => this.dispatchEvent(new CustomEvent('delete-todo', { detail: e.detail, bubbles: true, composed: true }))}
-          @update-todo=${(e) => this.dispatchEvent(new CustomEvent('update-todo', { detail: e.detail, bubbles: true, composed: true }))}
-        ></todo-item>
-      `)}
-    </div>
-  `;
-}
 
-
+  /**
+   * Forwards custom events from children to parent.
+   * @param {CustomEvent} e
+   * @private
+   */
   _forwardEvent(e) {
     this.dispatchEvent(new CustomEvent(e.type, {
       detail: e.detail,

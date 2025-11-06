@@ -4,9 +4,16 @@ import { StorageService } from '../services/storage-service.js';
 import './todo-form.js';
 import './todo-list.js';
 
+/**
+ * Main Todo App component.
+ * Manages todos, renders UI, and handles user interactions.
+ */
 export class TodoApp extends LitElement {
   static properties = {
+    /** List of todos */
     todos: { state: true },
+
+    /** Count of active todos */
     activeCount: { state: true }
   };
 
@@ -116,24 +123,39 @@ export class TodoApp extends LitElement {
     this.activeCount = this.todos.length;
   }
 
+  /**
+   * Adds a new todo item.
+   * @param {CustomEvent<{text: string}>} e - Event containing new todo text.
+   */
   handleAdd = (e) => {
     this.model.addTodo(e.detail.text);
     this.storageService.save(this.model.todos);
     this._syncModel();
   };
 
+  /**
+   * Deletes a todo item.
+   * @param {CustomEvent<{id: number}>} e - Event containing the ID to delete.
+   */
   handleToggle = (e) => {
     this.model.deleteTodo(e.detail.id);
     this.storageService.save(this.model.todos);
     this._syncModel();
   };
 
+  /**
+   * Updates an existing todo item's text.
+   * @param {CustomEvent<{id: number, text: string}>} e - Event with updated text.
+   */
   handleUpdate = (e) => {
     this.model.updateTodo(e.detail.id, e.detail.text);
     this.storageService.save(this.model.todos);
     this._syncModel();
   };
 
+  /**
+   * Clears all todos with user confirmation.
+   */
   handleClearAll = () => {
     if (confirm('Clear ALL todos? This cannot be undone.')) {
       this.model.clearAll();
@@ -142,6 +164,10 @@ export class TodoApp extends LitElement {
     }
   };
 
+  /**
+   * Renders the UI for the todo app.
+   * @returns {import('lit').TemplateResult}
+   */
   render() {
     return html`
       <div class="app-container">

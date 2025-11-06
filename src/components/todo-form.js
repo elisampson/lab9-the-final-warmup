@@ -1,7 +1,11 @@
 import { LitElement, html, css } from 'lit';
 
 /**
- * Form for adding a new todo item.
+ * `<todo-form>` component.
+ * Renders a form to input and submit a new todo item.
+ *
+ * Emits:
+ * - `add-todo`: CustomEvent<{ text: string }> — when the user submits a new todo.
  */
 export class TodoForm extends LitElement {
   static properties = {
@@ -53,11 +57,18 @@ export class TodoForm extends LitElement {
     this.text = '';
   }
 
+  /**
+   * Updates text as the user types.
+   * @param {InputEvent} e
+   */
   handleInput(e) {
     this.text = e.target.value;
   }
 
-  // Handle form submission
+  /**
+   * Emits add-tod event with trimmed text.
+   * @param {SubmitEvent} e
+   */
   handleSubmit(e) {
     e.preventDefault();
     const trimmed = this.text.trim();
@@ -71,6 +82,10 @@ export class TodoForm extends LitElement {
     }
   }
 
+  /**
+   * Renders the input form UI.
+   * @returns {import('lit').TemplateResult}
+   */
   render() {
     return html`
       <form @submit=${this.handleSubmit}>
