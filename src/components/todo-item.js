@@ -131,6 +131,15 @@ export class TodoItem extends LitElement {
   }
 
   /**
+ * Prevent the checkbox from showing a visual check.
+ * @param {MouseEvent} e
+ */
+  preventCheck(e) {
+    e.preventDefault(); 
+}
+
+
+  /**
    * Renders the todo item (view or edit mode).
    * @returns {import('lit').TemplateResult}
    */
@@ -139,6 +148,7 @@ export class TodoItem extends LitElement {
       <div class="todo-item">
         <input
           type="checkbox"
+          @mousedown=${this.preventCheck}
           @change=${this.completeAndRemove}
         />
         ${this.isEditing
