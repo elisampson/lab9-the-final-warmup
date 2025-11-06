@@ -29,3 +29,10 @@
     "vite": "^5.0.0"
   }
 }
+
+"scripts": {
+  "lint": "eslint .",
+  "test": "vitest run",
+  "build": "vite build",
+  "dev": "vite"
+}
